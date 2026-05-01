@@ -1,121 +1,142 @@
 import SwiftUI
 
+/// Accueil ROUTEPASS — reprend exactement le mockup iPhone 16 :
+/// - Header "Bonjour, Richard" + avatar
+/// - 4 quick actions en ligne (Me déplacer / Accéder / Scan / Bons)
+/// - Section "En vedette" avec scroll horizontal + dots indicator
+/// - Section "Récemment consultés" avec cards horizontales
 struct AccueilView: View {
+    @Environment(AppState.self) private var appState
     @State private var isLoading: Bool = true
-    @State private var appeared: Bool = false
+    @State private var featuredIndex: Int = 0
+
+    private var firstName: String {
+        appState.userEmail.split(separator: "@").first.map(String.init)?.capitalized ?? "Richard"
+    }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                headerSection
+            VStack(alignment: .leading, spacing: RPTheme.Spacing.lg) {
+                header
+                quickActionsRow
                 featuredSection
                 recentSection
             }
-            .padding(.bottom, 80)
+            .padding(.top, 12)
+            .padding(.bottom, 120)
         }
         .scrollIndicators(.hidden)
+        .background(RPTheme.black.ignoresSafeArea())
         .task {
-            try? await Task.sleep(for: .seconds(1.2))
+            try? await Task.sleep(for: .seconds(0.8))
             withAnimation(.spring(response: 0.4)) {
                 isLoading = false
             }
         }
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                appeared = true
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Bonjour ,")
+                    .font(RPFont.body(13))
+                    .foregroundStyle(RPTheme.gray)
+                Text(firstName)
+                    .font(RPFont.display(28))
+                    .foregroundStyle(RPTheme.white)
             }
+            Spacer()
+            avatarButton
+        }
+        .padding(.horizontal, RPTheme.Spacing.lg)
+    }
+
+    private var avatarButton: some View {
+        ZStack {
+            Circle()
+                .fill(RPTheme.dark)
+                .overlay(Circle().stroke(RPTheme.gold.opacity(0.4), lineWidth: 1))
+                .frame(width: 38, height: 38)
+            Image(systemName: "person.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(RPTheme.gold)
         }
     }
 
-    private var headerSection: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.sm) {
-            HStack {
-                VStack(alignment: .leading, spacing: RPTheme.Spacing.xs) {
-                    Text("Bonjour, Alex")
-                        .font(.system(.largeTitle, design: .default, weight: .bold))
-                        .foregroundStyle(RPTheme.textPrimary)
+    // MARK: - Quick actions
 
-                    Text("Que recherchez-vous aujourd'hui ?")
-                        .font(.system(.body, design: .default))
-                        .foregroundStyle(RPTheme.textSecondary)
-                }
-
-                Spacer()
-
-                Circle()
-                    .fill(RPTheme.accent.opacity(0.15))
-                    .frame(width: 48, height: 48)
-                    .overlay {
-                        Image(systemName: "bell.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(RPTheme.accent)
-                    }
-            }
+    private var quickActionsRow: some View {
+        HStack(spacing: 12) {
+            RPQuickActionTile(icon: "car.fill",          label: "Me déplacer", isHighlighted: false)
+            RPQuickActionTile(icon: "key.fill",          label: "Accéder",     isHighlighted: true)
+            RPQuickActionTile(icon: "qrcode.viewfinder", label: "Scan",        isHighlighted: false)
+            RPQuickActionTile(icon: "ticket.fill",       label: "Bons",        isHighlighted: false)
         }
-        .padding(.horizontal, RPTheme.Spacing.md)
-        .padding(.top, RPTheme.Spacing.lg)
-        .padding(.bottom, RPTheme.Spacing.md)
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
+        .padding(.horizontal, RPTheme.Spacing.lg)
     }
+
+    // MARK: - En vedette
 
     private var featuredSection: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("En vedette")
-                    .font(.system(.title3, design: .default, weight: .bold))
-                    .foregroundStyle(RPTheme.textPrimary)
-
+                    .font(RPFont.display(20))
+                    .foregroundStyle(RPTheme.white)
                 Spacer()
-
-                Button("Voir tout") {}
-                    .buttonStyle(RPGhostButtonStyle())
-                    .font(.system(.subheadline, design: .rounded, weight: .medium))
+                Button("Tout voir") {}
+                    .font(RPFont.body(12, weight: .medium))
+                    .foregroundStyle(RPTheme.gold)
             }
-            .padding(.horizontal, RPTheme.Spacing.md)
+            .padding(.horizontal, RPTheme.Spacing.lg)
 
-            ScrollView(.horizontal) {
-                HStack(spacing: 16) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
                     ForEach(MockData.featuredItems) { item in
                         RPFeaturedCard(item: item)
                     }
                 }
+                .padding(.horizontal, RPTheme.Spacing.lg)
             }
-            .contentMargins(.horizontal, 16)
-            .scrollIndicators(.hidden)
+
+            HStack(spacing: 5) {
+                ForEach(MockData.featuredItems.indices, id: \.self) { i in
+                    Capsule()
+                        .fill(i == featuredIndex ? RPTheme.gold : RPTheme.border)
+                        .frame(width: i == featuredIndex ? 16 : 5, height: 5)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
-        .padding(.bottom, RPTheme.Spacing.lg)
     }
 
+    // MARK: - Récemment consultés
+
     private var recentSection: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Récemment consultés")
-                    .font(.system(.title3, design: .default, weight: .bold))
-                    .foregroundStyle(RPTheme.textPrimary)
-
+                    .font(RPFont.display(20))
+                    .foregroundStyle(RPTheme.white)
                 Spacer()
             }
-            .padding(.horizontal, RPTheme.Spacing.md)
+            .padding(.horizontal, RPTheme.Spacing.lg)
 
-            VStack(spacing: RPTheme.Spacing.md) {
+            VStack(spacing: 10) {
                 if isLoading {
-                    ForEach(0..<3, id: \.self) { _ in
+                    ForEach(0..<2, id: \.self) { _ in
                         ShimmerCardView()
                     }
                 } else {
-                    ForEach(Array(MockData.transportItems.prefix(3))) { item in
+                    ForEach(MockData.recentItems) { item in
                         RPCard(item: item)
                             .sensoryFeedback(.impact(flexibility: .soft), trigger: item.id)
                     }
                 }
             }
-            .padding(.horizontal, RPTheme.Spacing.md)
-
-            Button("Explorer tout") {}
-                .buttonStyle(RPPrimaryButtonStyle())
-                .padding(.horizontal, RPTheme.Spacing.md)
-                .padding(.top, RPTheme.Spacing.sm)
+            .padding(.horizontal, RPTheme.Spacing.lg)
         }
     }
 }
