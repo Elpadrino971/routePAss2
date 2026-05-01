@@ -98,7 +98,7 @@ export default function OnboardingPage() {
         role === 'admin'
           ? '/admin/dashboard'
           : role === 'provider'
-          ? '/dashboard'
+          ? '/setup'
           : role === 'owner'
           ? '/dashboard'
           : '/home';

@@ -11,10 +11,21 @@ Stack : **Next.js 14** (App Router) · **TypeScript strict** · **Tailwind CSS**
 | Phase | Description | Statut |
 | --- | --- | --- |
 | 1 | Fondations (auth, onboarding, layout, composants RP*) | ✅ Terminée |
-| 2 | Transport — QR code + paiement Stripe Connect | ⏳ À venir |
+| 2 | Transport — QR code + paiement Stripe Connect | ✅ Terminée |
 | 3 | Location autonome — TTLock + Shelly + caution Hold | ⏳ À venir |
 | 4 | Carte temps réel Mapbox | ⏳ À venir |
 | 5 | Admin + push + tests E2E | ⏳ À venir |
+
+## Phase 2 — livrables
+
+- Migration Supabase Storage (`0002_storage.sql`) : buckets `avatars`, `provider-docs`, `asset-photos`, `booking-photos` + policies par utilisateur.
+- Provider Setup (`/setup`) en 3 étapes : type de service, photo véhicule + pièces (Storage), Stripe Connect Express.
+- Espace prestataire `(provider)` avec bottom nav dédié : `/dashboard` (revenus du jour, état Stripe), `/my-qr` (QR signé persistant), `/validate` (saisie code 4 chiffres OTP-style), `/earnings` (historique).
+- Liste prestataires côté client (`/transport`) + fiche détail (`/transport/[id]`) avec checkout Stripe Elements (Apple Pay + Google Pay + carte) et révélation du code à 4 chiffres après confirmation.
+- Scanner QR (`/transport/scan`) qui décode le JWT et redirige vers la fiche.
+- API routes : `/api/stripe/connect/onboard` (compte Express + onboarding link), `/api/stripe/create-payment` (PaymentIntent + commission Stripe Connect), `/api/stripe/webhook` (succeeded/failed/account.updated → MAJ status + verified), `/api/transactions/validate` (provider entre le code 4 digits → completed), `/api/qr/resolve` (vérification JWT et résolution provider/access).
+- `/wallet` côté client : total dépensé + historique paginé.
+- Commission par verticale (5–10 %) appliquée via `application_fee_amount` Stripe Connect.
 
 ## Phase 1 — livrables
 
