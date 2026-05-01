@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Palette stricte ROUTEPASS - dark luxury */
+    --rp-black: #08080d;
+    --rp-dark: #0f0f18;
+    --rp-dark-2: #16161f;
+    --rp-border: #1e1e2e;
+    --rp-gold: #c9a84c;
+    --rp-gold-light: #e8c96a;
+    --rp-gold-muted: #8b6e2a;
+    --rp-white: #f5f0e8;
+    --rp-gray: #6b6b7b;
+    --rp-success: #22c55e;
+    --rp-danger: #ef4444;
+    --rp-warning: #f59e0b;
+    --rp-info: #3b82f6;
+  }
+
+  html,
+  body {
+    background-color: var(--rp-black);
+    color: var(--rp-white);
+    font-family: var(--font-body), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background-color: rgba(201, 168, 76, 0.3);
+    color: var(--rp-white);
+  }
+
+  /* Scrollbars discrètes */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--rp-border);
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .rp-gradient-gold {
+    background: linear-gradient(135deg, #c9a84c 0%, #e8c96a 50%, #8b6e2a 100%);
+  }
+
+  .rp-text-gradient-gold {
+    background: linear-gradient(135deg, #e8c96a 0%, #c9a84c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .rp-glass {
+    background-color: rgba(15, 15, 24, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--rp-border);
+  }
+
+  .rp-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--rp-gold);
+    font-family: var(--font-display), serif;
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+  .rp-divider::before,
+  .rp-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(201, 168, 76, 0.4) 50%,
+      transparent 100%
+    );
+  }
+
+  .rp-skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--rp-dark) 0%,
+      var(--rp-dark-2) 50%,
+      var(--rp-dark) 100%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+}

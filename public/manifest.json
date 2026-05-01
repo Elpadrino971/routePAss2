@@ -1,0 +1,12 @@
+{
+  "name": "ROUTEPASS",
+  "short_name": "ROUTEPASS",
+  "description": "Infrastructure de paiement pour l'économie réelle",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#08080D",
+  "theme_color": "#08080D",
+  "icons": [
+    { "src": "/logo-r.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
