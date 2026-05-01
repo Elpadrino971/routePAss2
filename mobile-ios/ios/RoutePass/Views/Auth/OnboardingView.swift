@@ -1,58 +1,59 @@
 import SwiftUI
 
+/// Onboarding ROUTEPASS — 3 slides plein écran qui reprennent EXACTEMENT les
+/// maquettes iPhone 16 fournies dans le master prompt :
+///   1. « Payez, montez, partez »
+///   2. « Louez sans, contact »
+///   3. « Vos actifs, travaillent pour vous »
+///
+/// Chaque slide affiche une hero image plein écran (voiture devant un palace,
+/// Mercedes éclairée la nuit, villa au coucher du soleil), un divider « R » or
+/// italique, et le bouton « Suivant » / « Commencer » or en bas.
 struct OnboardingView: View {
     @State private var currentPage: Int = 0
-    @State private var appeared: Bool = false
     @State private var showRoleSheet: Bool = false
 
     let onComplete: (UserRole) -> Void
 
     private let slides: [OnboardingSlide] = [
         OnboardingSlide(
-            emojis: ["🚕", "🚌", "🛥️", "🚛"],
-            title: "Payez, montez, partez",
-            subtitle: "Scannez le QR code de votre prestataire et payez en quelques secondes.",
-            accentIcon: "qrcode.viewfinder",
-            gradient: [Color.orange.opacity(0.1), RPTheme.accent.opacity(0.08)]
+            imageURL: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+            titleStart: "Payez, montez,",
+            titleAccent: "partez",
+            subtitle: "Scannez, réservez et accédez à vos transports et locations en quelques secondes."
         ),
         OnboardingSlide(
-            emojis: ["🔑", "📱", "✨", "🏎️"],
-            title: "Louez sans contact",
-            subtitle: "Véhicules, bateaux, appartements. Disponibilité en temps réel, accès autonome.",
-            accentIcon: "key.fill",
-            gradient: [Color.blue.opacity(0.1), RPTheme.accent.opacity(0.08)]
+            imageURL: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80",
+            titleStart: "Louez sans,",
+            titleAccent: "contact",
+            subtitle: "Véhicules, bateaux, appartements. Disponibilité en temps réel, accès autonome."
         ),
         OnboardingSlide(
-            emojis: ["💰", "📈", "🏠", "⚡"],
-            title: "Vos actifs travaillent pour vous",
-            subtitle: "Mettez votre bien en location. Recevez vos paiements automatiquement.",
-            accentIcon: "chart.line.uptrend.xyaxis",
-            gradient: [Color.green.opacity(0.1), RPTheme.accent.opacity(0.08)]
+            imageURL: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80",
+            titleStart: "Vos actifs,",
+            titleAccent: "travaillent pour vous",
+            subtitle: "Mettez vos biens en location. Recevez vos paiements automatiquement."
         ),
     ]
 
     var body: some View {
         ZStack {
-            RPTheme.backgroundPrimary
-                .ignoresSafeArea()
+            RPTheme.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 TabView(selection: $currentPage) {
-                    ForEach(Array(slides.enumerated()), id: \.offset) { index, slide in
-                        slideContent(slide: slide, index: index)
+                    ForEach(slides.indices, id: \.self) { index in
+                        slideContent(slide: slides[index])
                             .tag(index)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                .ignoresSafeArea(edges: .top)
 
                 bottomSection
             }
         }
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.1)) {
-                appeared = true
-            }
-        }
+        .preferredColorScheme(.dark)
         .sheet(isPresented: $showRoleSheet) {
             RoleSelectionView(onRoleSelected: { role in
                 showRoleSheet = false
@@ -61,124 +62,160 @@ struct OnboardingView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(24)
+            .presentationBackground(RPTheme.dark)
         }
     }
 
-    private func slideContent(slide: OnboardingSlide, index: Int) -> some View {
-        VStack(spacing: RPTheme.Spacing.xl) {
-            Spacer()
+    // MARK: - Slide content
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 32)
-                    .fill(
-                        LinearGradient(
-                            colors: slide.gradient,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 240, height: 240)
-
-                Image(systemName: slide.accentIcon)
-                    .font(.system(size: 48, weight: .light))
-                    .foregroundStyle(RPTheme.accent.opacity(0.15))
-                    .offset(x: 60, y: -60)
-
-                floatingEmojis(slide.emojis, index: index)
-            }
-            .opacity(appeared ? 1 : 0)
-            .scaleEffect(appeared ? 1 : 0.85)
+    @ViewBuilder
+    private func slideContent(slide: OnboardingSlide) -> some View {
+        VStack(spacing: 0) {
+            heroImage(url: slide.imageURL)
+                .frame(maxWidth: .infinity)
+                .frame(height: UIScreen.main.bounds.height * 0.62)
+                .overlay(alignment: .top) {
+                    monogramHeader
+                        .padding(.top, 56)
+                }
 
             VStack(spacing: RPTheme.Spacing.md) {
-                Text(slide.title)
-                    .font(.system(size: 28, weight: .bold, design: .default))
-                    .foregroundStyle(RPTheme.textPrimary)
-                    .multilineTextAlignment(.center)
-
+                titleBlock(start: slide.titleStart, accent: slide.titleAccent)
+                rDivider
                 Text(slide.subtitle)
-                    .font(.system(size: 16, weight: .regular, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(14))
+                    .foregroundStyle(RPTheme.gray)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .padding(.horizontal, RPTheme.Spacing.xl)
             }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 20)
+            .padding(.top, RPTheme.Spacing.lg)
 
-            Spacer()
-            Spacer()
+            Spacer(minLength: 0)
         }
     }
 
-    private func floatingEmojis(_ emojis: [String], index: Int) -> some View {
-        let positions: [(x: CGFloat, y: CGFloat)] = [
-            (-70, -70), (70, -50), (-50, 60), (80, 70)
-        ]
-        return ZStack {
-            ForEach(Array(emojis.enumerated()), id: \.offset) { i, emoji in
-                Text(emoji)
-                    .font(.system(size: 40))
-                    .offset(x: positions[i].x, y: positions[i].y)
-                    .rotationEffect(.degrees(Double(i) * 8 - 12))
+    private func heroImage(url: String) -> some View {
+        ZStack {
+            AsyncImage(url: URL(string: url)) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().scaledToFill()
+                case .empty:
+                    RPTheme.dark2
+                case .failure:
+                    RPTheme.dark2
+                @unknown default:
+                    RPTheme.dark2
+                }
             }
+            .clipped()
+
+            // Vignette dégradée du noir vers transparent (en bas)
+            LinearGradient(
+                colors: [RPTheme.black.opacity(0.0), RPTheme.black.opacity(0.4), RPTheme.black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
         }
     }
+
+    private var monogramHeader: some View {
+        VStack(spacing: 2) {
+            Text("R")
+                .font(RPFont.display(36))
+                .foregroundStyle(RPTheme.goldGradient)
+            Text("ROUTEPASS")
+                .font(.system(size: 9, weight: .semibold))
+                .tracking(4)
+                .foregroundStyle(RPTheme.gold)
+        }
+    }
+
+    private func titleBlock(start: String, accent: String) -> some View {
+        // Titre avec une partie "italique or" (cf. mockups : "Payez, montez, *partez*")
+        (
+            Text(start + " ")
+                .foregroundStyle(RPTheme.white)
+            +
+            Text(accent)
+                .foregroundStyle(RPTheme.gold)
+                .italic()
+        )
+        .font(RPFont.display(30))
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, RPTheme.Spacing.lg)
+    }
+
+    /// Divider « R » or au centre, deux lignes fines or sur les côtés.
+    private var rDivider: some View {
+        HStack(spacing: 12) {
+            line
+            Text("R")
+                .font(RPFont.displayItalic(16))
+                .foregroundStyle(RPTheme.gold)
+            line
+        }
+        .frame(width: 120)
+    }
+
+    private var line: some View {
+        LinearGradient(
+            colors: [RPTheme.gold.opacity(0), RPTheme.gold.opacity(0.6), RPTheme.gold.opacity(0)],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .frame(height: 1)
+    }
+
+    // MARK: - Bottom
 
     private var bottomSection: some View {
-        VStack(spacing: RPTheme.Spacing.lg) {
-            HStack(spacing: 8) {
-                ForEach(0..<slides.count, id: \.self) { index in
+        VStack(spacing: RPTheme.Spacing.md) {
+            // Dots
+            HStack(spacing: 6) {
+                ForEach(slides.indices, id: \.self) { i in
                     Capsule()
-                        .fill(index == currentPage ? RPTheme.accent : RPTheme.textSecondary.opacity(0.2))
-                        .frame(width: index == currentPage ? 24 : 8, height: 8)
+                        .fill(i == currentPage ? RPTheme.gold : RPTheme.border)
+                        .frame(width: i == currentPage ? 22 : 6, height: 6)
                         .animation(.spring(response: 0.35, dampingFraction: 0.75), value: currentPage)
                 }
             }
+            .padding(.bottom, 4)
 
-            if currentPage == slides.count - 1 {
-                Button {
-                    showRoleSheet = true
-                } label: {
-                    Text("Commencer")
-                }
-                .buttonStyle(RPPrimaryButtonStyle())
-                .padding(.horizontal, RPTheme.Spacing.xl)
-                .transition(.scale.combined(with: .opacity))
-            } else {
-                Button {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        currentPage += 1
-                    }
-                } label: {
-                    Text("Suivant")
-                }
-                .buttonStyle(RPSecondaryButtonStyle())
-                .padding(.horizontal, RPTheme.Spacing.xl)
-                .transition(.scale.combined(with: .opacity))
+            Button(action: advance) {
+                Text(isLast ? "Commencer" : "Suivant")
             }
+            .buttonStyle(RPPrimaryButtonStyle(size: .lg))
+            .padding(.horizontal, RPTheme.Spacing.xl)
 
-            Button {
-                if currentPage < slides.count - 1 {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        currentPage = slides.count - 1
-                    }
-                } else {
+            if !isLast {
+                Button("Passer") {
                     showRoleSheet = true
                 }
-            } label: {
-                Text("Passer")
+                .buttonStyle(RPGhostButtonStyle())
             }
-            .buttonStyle(RPGhostButtonStyle())
         }
+        .padding(.top, RPTheme.Spacing.md)
         .padding(.bottom, RPTheme.Spacing.xl)
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentPage)
+    }
+
+    private var isLast: Bool { currentPage == slides.count - 1 }
+
+    private func advance() {
+        if isLast {
+            showRoleSheet = true
+        } else {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                currentPage += 1
+            }
+        }
     }
 }
 
 private struct OnboardingSlide {
-    let emojis: [String]
-    let title: String
+    let imageURL: String
+    let titleStart: String
+    let titleAccent: String
     let subtitle: String
-    let accentIcon: String
-    let gradient: [Color]
 }
