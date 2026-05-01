@@ -20,12 +20,13 @@ export default async function ProviderLayout({
     .maybeSingle();
 
   if (!profile) redirect('/onboarding');
-  if (profile.role !== 'provider' && profile.role !== 'admin') redirect('/home');
+  const allowed = ['provider', 'owner', 'admin'] as const;
+  if (!allowed.includes(profile.role as typeof allowed[number])) redirect('/home');
 
   return (
     <>
       <main className="mx-auto min-h-dvh max-w-md pb-24">{children}</main>
-      <ProviderBottomNav />
+      <ProviderBottomNav role={profile.role as 'provider' | 'owner' | 'admin'} />
     </>
   );
 }

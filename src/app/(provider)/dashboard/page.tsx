@@ -14,10 +14,13 @@ export default async function ProviderDashboard() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('id, full_name, avatar_url')
+    .select('id, role, full_name, avatar_url')
     .eq('auth_user_id', user.id)
     .maybeSingle();
   if (!profile) redirect('/onboarding');
+
+  // Les owners n'ont pas de ligne providers — on les redirige vers leurs biens.
+  if (profile.role === 'owner') redirect('/assets');
 
   const { data: provider } = await supabase
     .from('providers')

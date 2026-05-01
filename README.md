@@ -12,9 +12,35 @@ Stack : **Next.js 14** (App Router) · **TypeScript strict** · **Tailwind CSS**
 | --- | --- | --- |
 | 1 | Fondations (auth, onboarding, layout, composants RP*) | ✅ Terminée |
 | 2 | Transport — QR code + paiement Stripe Connect | ✅ Terminée |
-| 3 | Location autonome — TTLock + Shelly + caution Hold | ⏳ À venir |
-| 4 | Carte temps réel Mapbox | ⏳ À venir |
-| 5 | Admin + push + tests E2E | ⏳ À venir |
+| 3 | Location autonome — TTLock + Shelly + caution Hold | ✅ Terminée |
+| 4 | Carte temps réel Mapbox | ✅ Terminée |
+| 5 | Admin + push notifications | ✅ Terminée |
+
+## Phase 5 — livrables
+
+- Espace admin `(admin)/admin/*` avec layout dédié (header + nav).
+- `/admin/dashboard` : utilisateurs, prestataires, actifs, GMV, commission ROUTEPASS cumulée.
+- `/admin/validations` : approbation/rejet des prestataires et biens en attente (`/api/admin/validate`).
+- `/admin/payouts` : déclenchement batch des virements via `/api/admin/payouts/batch` (Stripe Connect `payouts.create` sur chaque compte connecté avec solde > 0) + journal `payouts`.
+- Web Push : service worker `/public/sw.js`, table `push_subscriptions` (RLS par utilisateur), endpoint `/api/push/subscribe`, env VAPID.
+- Mode sombre cohérent + skeletons + empty states partout, mobile-first respecté.
+
+## Phase 4 — livrables
+
+- `/map` (client) : Mapbox GL JS thème dark, markers custom par catégorie d'actif et par type de service prestataire, légende, contrôle nav.
+- Carte verrouillée tant que l'utilisateur n'a pas un paiement confirmé (transactions OU bookings).
+- Realtime Supabase sur `providers` (positions GPS live) et `assets` (changement de statut → couleur du marker mise à jour) — migration `0003_realtime_providers.sql`.
+- Tap sur un marker → `RPBottomSheet` avec lien vers la fiche bien ou prestataire (réservation directe).
+
+## Phase 3 — livrables
+
+- IoT : wrappers `lib/ttlock.ts` (oauth + `identityCard/add` & `delete`) et `lib/shelly.ts` (Shelly Cloud REST `/device/relay/control`). API routes correspondantes côté `/api/ttlock/*` et `/api/shelly/*`.
+- Stripe caution : `/api/bookings/create` crée 2 PaymentIntents (loyer avec `application_fee_amount` + `transfer_data`, caution avec `capture_method: manual`), `/api/stripe/release-hold` (annule la caution), `/api/stripe/capture-hold` (capture totale ou partielle en cas de dommage).
+- Catalogue location (`/location`) avec filtres par catégorie, fiche détail (`/location/[id]`) avec statut **temps réel** via Supabase Realtime (`useAssetStatus`) + grille tarifaire heure/jour/semaine.
+- Flux réservation `BookingPanel` : sélection des dates → estimation → réservation → Stripe Elements (loyer + caution) → redirection vers la confirmation.
+- Confirmation `/location/booking/[id]` : QR d'accès JWT signé (`signAccessQR`, expire à `end_at`), instructions, `CheckinActions` pour `Démarrer la location` (TTLock NFC + Shelly on, asset → `occupied`, booking → `active`) et `Restituer` (NFC off, Shelly off, asset → `cleaning` avec `available_from`, booking → `completed`, libération auto de la caution si pas de dommage).
+- Cron `/api/cron/end-bookings` (toutes les 5 min via `vercel.json`) : termine automatiquement les bookings expirés et fait passer les biens `cleaning` → `available`.
+- Espace owner via le groupe `(provider)` : nav adaptée selon le rôle (`/dashboard`, `/assets`, `/earnings`, `/account`), création de bien `/assets/new` (catégorie, photos multiples vers Storage, tarifs, caution, adresse).
 
 ## Phase 2 — livrables
 

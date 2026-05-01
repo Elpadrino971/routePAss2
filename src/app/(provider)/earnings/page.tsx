@@ -12,24 +12,50 @@ export default async function EarningsPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('id')
+    .select('id, role')
     .eq('auth_user_id', user.id)
     .maybeSingle();
   if (!profile) redirect('/onboarding');
 
-  const { data: provider } = await supabase
-    .from('providers')
-    .select('id')
-    .eq('user_id', profile.id)
-    .maybeSingle();
-  if (!provider) redirect('/setup');
+  let txns: { id: string; amount: number | null; commission_amount: number | null; status: string; created_at: string; completed_at?: string | null }[] = [];
 
-  const { data: txns } = await supabase
-    .from('transactions')
-    .select('id, amount, commission_amount, status, created_at, completed_at')
-    .eq('provider_id', provider.id)
-    .order('created_at', { ascending: false })
-    .limit(50);
+  if (profile.role === 'owner') {
+    // Revenus des bookings → on retrouve les biens du owner.
+    const { data: ownedAssets } = await supabase
+      .from('assets')
+      .select('id')
+      .eq('owner_id', profile.id);
+    const assetIds = (ownedAssets ?? []).map((a) => a.id);
+    if (assetIds.length > 0) {
+      const { data } = await supabase
+        .from('bookings')
+        .select('id, total_amount, commission_amount, status, created_at')
+        .in('asset_id', assetIds)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      txns = (data ?? []).map((b) => ({
+        id: b.id,
+        amount: b.total_amount,
+        commission_amount: b.commission_amount,
+        status: b.status,
+        created_at: b.created_at,
+      }));
+    }
+  } else {
+    const { data: provider } = await supabase
+      .from('providers')
+      .select('id')
+      .eq('user_id', profile.id)
+      .maybeSingle();
+    if (!provider) redirect('/setup');
+    const { data } = await supabase
+      .from('transactions')
+      .select('id, amount, commission_amount, status, created_at, completed_at')
+      .eq('provider_id', provider.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    txns = data ?? [];
+  }
 
   const total = (txns ?? [])
     .filter((t) => t.status === 'completed')
