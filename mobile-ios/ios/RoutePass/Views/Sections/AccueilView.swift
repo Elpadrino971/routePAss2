@@ -9,6 +9,7 @@ struct AccueilView: View {
     @Environment(AppState.self) private var appState
     @State private var isLoading: Bool = true
     @State private var featuredIndex: Int = 0
+    @State private var showScanner: Bool = false
 
     private var firstName: String {
         appState.userEmail.split(separator: "@").first.map(String.init)?.capitalized ?? "Richard"
@@ -27,6 +28,12 @@ struct AccueilView: View {
         }
         .scrollIndicators(.hidden)
         .background(RPTheme.black.ignoresSafeArea())
+        .fullScreenCover(isPresented: $showScanner) {
+            QRScannerView(
+                onDetected: { showScanner = false },
+                onDismiss: { showScanner = false }
+            )
+        }
         .task {
             try? await Task.sleep(for: .seconds(0.8))
             withAnimation(.spring(response: 0.4)) {
@@ -69,10 +76,18 @@ struct AccueilView: View {
 
     private var quickActionsRow: some View {
         HStack(spacing: 12) {
-            RPQuickActionTile(icon: "car.fill",          label: "Me déplacer", isHighlighted: false)
-            RPQuickActionTile(icon: "key.fill",          label: "Accéder",     isHighlighted: true)
-            RPQuickActionTile(icon: "qrcode.viewfinder", label: "Scan",        isHighlighted: false)
-            RPQuickActionTile(icon: "ticket.fill",       label: "Bons",        isHighlighted: false)
+            RPQuickActionTile(icon: "car.fill", label: "Me déplacer") {
+                NotificationCenter.default.post(name: .rpJumpToTab, object: 1) // Découvrir → Transport
+            }
+            RPQuickActionTile(icon: "key.fill", label: "Accéder", isHighlighted: true) {
+                NotificationCenter.default.post(name: .rpJumpToTab, object: 1) // Découvrir → Location
+            }
+            RPQuickActionTile(icon: "qrcode.viewfinder", label: "Scan") {
+                showScanner = true
+            }
+            RPQuickActionTile(icon: "map.fill", label: "Carte") {
+                NotificationCenter.default.post(name: .rpJumpToTab, object: 2) // Carte
+            }
         }
         .padding(.horizontal, RPTheme.Spacing.lg)
     }
@@ -95,7 +110,12 @@ struct AccueilView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(MockData.featuredItems) { item in
-                        RPFeaturedCard(item: item)
+                        Button {
+                            NotificationCenter.default.post(name: .rpJumpToTab, object: 1)
+                        } label: {
+                            RPFeaturedCard(item: item)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, RPTheme.Spacing.lg)
@@ -131,8 +151,13 @@ struct AccueilView: View {
                     }
                 } else {
                     ForEach(MockData.recentItems) { item in
-                        RPCard(item: item)
-                            .sensoryFeedback(.impact(flexibility: .soft), trigger: item.id)
+                        Button {
+                            NotificationCenter.default.post(name: .rpJumpToTab, object: 1)
+                        } label: {
+                            RPCard(item: item)
+                        }
+                        .buttonStyle(.plain)
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: item.id)
                     }
                 }
             }

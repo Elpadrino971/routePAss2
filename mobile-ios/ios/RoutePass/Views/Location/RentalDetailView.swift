@@ -42,14 +42,9 @@ struct RentalDetailView: View {
 
     private var gallerySection: some View {
         TabView(selection: $currentGalleryIndex) {
-            ForEach(Array(item.gallery.enumerated()), id: \.offset) { index, icon in
-                Color(RPTheme.accent.opacity(0.06))
-                    .overlay {
-                        Image(systemName: icon)
-                            .font(.system(size: 48))
-                            .foregroundStyle(RPTheme.accent.opacity(0.35))
-                            .allowsHitTesting(false)
-                    }
+            ForEach(Array(item.gallery.enumerated()), id: \.offset) { index, url in
+                RPImage(url: url, fallback: item.icon)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .tag(index)
             }
         }

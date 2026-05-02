@@ -2,13 +2,19 @@ import Foundation
 import SwiftUI
 
 enum LocationMockData {
+    /// Photos haute qualité Unsplash dans `gallery` (utilisées par les cards et le détail).
+    /// Le champ `icon` reste un SF Symbol (fallback si l'image ne charge pas).
     static let rentalItems: [RentalItem] = [
         RentalItem(
             id: "r1", name: "Tesla Model Y", description: "SUV électrique premium avec Autopilot. Intérieur cuir blanc, toit panoramique. Parfait pour les trajets urbains et les escapades weekend. Recharge complète incluse au départ.", category: .vehicules, status: .disponible,
             ownerName: "Claire Dubois", ownerVerified: true, rating: 4.9, reviewCount: 87,
             pricePerHour: "45 €", pricePerDay: "180 €", pricePerWeek: "950 €", pricePerMonth: "2 800 €",
             deposit: "1 500 €", icon: "bolt.car.fill",
-            gallery: ["bolt.car.fill", "car.top.radiowaves.front.fill", "steeringwheel", "fuelpump.fill"],
+            gallery: [
+                "https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["Électrique", "Automatique", "GPS", "Bluetooth"],
             occupiedUntil: nil, cleaningMinutes: 30, nextAvailable: nil,
             latitude: 48.8566, longitude: 2.3522, address: "Paris 1er, Rue de Rivoli"
@@ -18,7 +24,11 @@ enum LocationMockData {
             ownerName: "François Mercier", ownerVerified: true, rating: 4.7, reviewCount: 134,
             pricePerHour: "35 €", pricePerDay: "150 €", pricePerWeek: "850 €", pricePerMonth: "2 400 €",
             deposit: "2 000 €", icon: "car.fill",
-            gallery: ["car.fill", "car.side.fill", "suv.side.fill", "gauge.open.with.lines.needle.33percent"],
+            gallery: [
+                "https://images.unsplash.com/photo-1580414155951-08e2c2cc1bb1?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["4x4", "7 places", "Diesel", "Climatisation"],
             occupiedUntil: Date().addingTimeInterval(86400 * 3), cleaningMinutes: 45, nextAvailable: "18 Avr",
             latitude: 48.8738, longitude: 2.2950, address: "Paris 16ème, Avenue Foch"
@@ -28,7 +38,11 @@ enum LocationMockData {
             ownerName: "Antoine Leroy", ownerVerified: true, rating: 4.6, reviewCount: 52,
             pricePerHour: "120 €", pricePerDay: "650 €", pricePerWeek: "3 500 €", pricePerMonth: "10 000 €",
             deposit: "800 €", icon: "ferry.fill",
-            gallery: ["ferry.fill", "water.waves", "sun.max.fill", "figure.sailing"],
+            gallery: [
+                "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1542558817-5d8d717a85e9?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1502933691298-84fc14542831?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["12 places", "Motorisé", "Gilets inclus", "GPS marin"],
             occupiedUntil: nil, cleaningMinutes: 60, nextAvailable: nil,
             latitude: 43.2965, longitude: 5.3698, address: "Vieux-Port, Marseille"
@@ -38,7 +52,11 @@ enum LocationMockData {
             ownerName: "Isabelle Renard", ownerVerified: true, rating: 4.8, reviewCount: 203,
             pricePerHour: nil, pricePerDay: "180 €", pricePerWeek: "950 €", pricePerMonth: "2 400 €",
             deposit: "2 400 €", icon: "building.2.fill",
-            gallery: ["building.2.fill", "bed.double.fill", "sofa.fill", "fork.knife"],
+            gallery: [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["2 chambres", "Meublé", "Wifi", "Gardiennage"],
             occupiedUntil: nil, cleaningMinutes: 120, nextAvailable: nil,
             latitude: 48.8606, longitude: 2.3622, address: "Paris 3ème, Rue de Turenne"
@@ -48,7 +66,11 @@ enum LocationMockData {
             ownerName: "Jean-Pierre Vasseur", ownerVerified: true, rating: 4.9, reviewCount: 76,
             pricePerHour: nil, pricePerDay: "450 €", pricePerWeek: "2 800 €", pricePerMonth: "8 500 €",
             deposit: "3 000 €", icon: "house.and.flag.fill",
-            gallery: ["house.and.flag.fill", "water.waves", "figure.pool.swim", "tree.fill"],
+            gallery: [
+                "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["4 chambres", "Piscine", "Bord de mer", "Personnel"],
             occupiedUntil: Date().addingTimeInterval(86400 * 7), cleaningMinutes: 180, nextAvailable: "22 Avr",
             latitude: 43.5528, longitude: 7.0174, address: "Antibes, Bord de Mer"
@@ -58,7 +80,10 @@ enum LocationMockData {
             ownerName: "Maxime Perrin", ownerVerified: false, rating: 4.4, reviewCount: 38,
             pricePerHour: "8 €", pricePerDay: "35 €", pricePerWeek: "180 €", pricePerMonth: "450 €",
             deposit: "300 €", icon: "scooter",
-            gallery: ["scooter", "helmet.fill", "fuelpump.fill", "location.fill"],
+            gallery: [
+                "https://images.unsplash.com/photo-1591769225440-811ad7d6eab3?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["125cc", "Casque inclus", "Économique", "Antivol"],
             occupiedUntil: nil, cleaningMinutes: 15, nextAvailable: nil,
             latitude: 48.8530, longitude: 2.3499, address: "Paris 5ème, Rue Mouffetard"
@@ -68,7 +93,10 @@ enum LocationMockData {
             ownerName: "Éric Blanchard", ownerVerified: true, rating: 4.8, reviewCount: 29,
             pricePerHour: "200 €", pricePerDay: "1 200 €", pricePerWeek: "6 500 €", pricePerMonth: "18 000 €",
             deposit: "2 500 €", icon: "sailboat.fill",
-            gallery: ["sailboat.fill", "water.waves", "speaker.wave.3.fill", "sun.max.fill"],
+            gallery: [
+                "https://images.unsplash.com/photo-1589989993155-c5b1cea4775b?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1493612276216-ee3925520721?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["8 places", "Climatisée", "Sono", "Glacière"],
             occupiedUntil: nil, cleaningMinutes: 90, nextAvailable: nil,
             latitude: 43.6961, longitude: 7.2716, address: "Port de Nice"
@@ -78,7 +106,10 @@ enum LocationMockData {
             ownerName: "Catherine Girard", ownerVerified: true, rating: 4.5, reviewCount: 145,
             pricePerHour: nil, pricePerDay: "95 €", pricePerWeek: "550 €", pricePerMonth: "1 600 €",
             deposit: "1 600 €", icon: "house.fill",
-            gallery: ["house.fill", "bed.double.fill", "wifi", "bolt.fill"],
+            gallery: [
+                "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
+            ],
             features: ["Meublé", "Wifi fibre", "Climatisé", "Proche métro"],
             occupiedUntil: nil, cleaningMinutes: 60, nextAvailable: nil,
             latitude: 48.8534, longitude: 2.3340, address: "Paris 6ème, Rue de Seine"

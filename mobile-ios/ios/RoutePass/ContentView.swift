@@ -41,6 +41,14 @@ struct ContentView: View {
             .task {
                 LocationManager.shared.requestAuthorization()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .rpJumpToTab)) { note in
+                if let target = note.object as? Int, (0...3).contains(target) {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                        currentPage = target
+                    }
+                    hapticTrigger += 1
+                }
+            }
 
             bottomDock
                 .padding(.horizontal, 20)

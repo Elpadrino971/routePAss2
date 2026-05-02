@@ -40,13 +40,13 @@ struct MapTabView: View {
         .onAppear {
             locationManager.requestAuthorization()
         }
-        .sheet(isPresented: .constant(true)) {
+        // Sheet "À proximité" — bottom-anchored, ne masque pas le dock (max ~ 60% écran).
+        // Pour ne pas cacher la barre du bas, on le présente comme un overlay et non
+        // comme un .sheet natif (qui couvre tout).
+        .overlay(alignment: .bottom) {
             nearbySheet
-                .presentationDetents([.height(120), .medium, .large])
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-                .presentationDragIndicator(.visible)
-                .presentationBackground(RPTheme.dark)
-                .interactiveDismissDisabled()
+                .padding(.bottom, 96) // au-dessus du dock or
+                .padding(.horizontal, 12)
         }
     }
 
@@ -126,23 +126,36 @@ struct MapTabView: View {
     // MARK: - Bottom sheet
 
     private var nearbySheet: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.md) {
-            Text("À PROXIMITÉ").rpKicker()
-            Text("\(MockMapMarkers.all.count) résultats")
-                .font(RPFont.display(18))
-                .foregroundStyle(RPTheme.white)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("À PROXIMITÉ").rpKicker()
+                Spacer()
+                Text("\(MockMapMarkers.all.count) résultats")
+                    .font(RPFont.body(11, weight: .semibold))
+                    .foregroundStyle(RPTheme.gray)
+            }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     ForEach(MockMapMarkers.all) { m in
                         nearbyCard(m)
                     }
                 }
-                .padding(.horizontal, 2)
             }
         }
-        .padding(RPTheme.Spacing.lg)
-        .padding(.bottom, 40)
+        .padding(14)
+        .background(
+            ZStack {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(RPTheme.dark.opacity(0.85))
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(RPTheme.border, lineWidth: 1)
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .rpCardShadow()
     }
 
     private func nearbyCard(_ m: MockMapMarker) -> some View {

@@ -1,85 +1,92 @@
 import SwiftUI
 
+/// Card grid Outils — photo Unsplash en haut (130pt), titre + marque/modèle,
+/// étoiles, prix or, badge état dans l'image, le tout en dark luxury.
 struct ToolGridCard: View {
     let tool: ToolItem
     @State private var appeared: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Color(RPTheme.accent.opacity(0.06))
-                .frame(height: 130)
-                .overlay {
-                    VStack(spacing: RPTheme.Spacing.sm) {
-                        Image(systemName: tool.icon)
-                            .font(.system(size: 30))
-                            .foregroundStyle(RPTheme.accent.opacity(0.45))
-                        HStack(spacing: 4) {
-                            Text(tool.condition.rawValue)
-                                .font(.system(.caption2, design: .default, weight: .medium))
-                                .foregroundStyle(tool.condition.color)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(tool.condition.color.opacity(0.12))
-                                .clipShape(Capsule())
-                            if tool.deliveryAvailable {
-                                Image(systemName: "shippingbox.fill")
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(RPTheme.textSecondary)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color(.systemBackground).opacity(0.8))
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .allowsHitTesting(false)
-                }
-                .clipShape(.rect(cornerRadius: 14))
-                .overlay(alignment: .topLeading) {
-                    RPBadge(status: tool.status)
-                        .scaleEffect(0.8)
-                        .padding(6)
-                }
+            ZStack(alignment: .topLeading) {
+                RPImage(url: tool.gallery.first, fallback: tool.icon)
+                    .frame(height: 130)
 
-            VStack(alignment: .leading, spacing: RPTheme.Spacing.xs) {
+                LinearGradient(
+                    colors: [.black.opacity(0), .black.opacity(0.55)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 130)
+
+                RPBadge(status: tool.status, compact: true)
+                    .padding(8)
+
+                if tool.deliveryAvailable {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            HStack(spacing: 3) {
+                                Image(systemName: "shippingbox.fill").font(.system(size: 9))
+                                Text("Livraison").font(.system(size: 9, weight: .semibold))
+                            }
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(.black.opacity(0.55)))
+                        }
+                        Spacer()
+                    }
+                    .padding(8)
+                }
+            }
+            .frame(height: 130)
+            .clipped()
+
+            VStack(alignment: .leading, spacing: 5) {
                 Text(tool.name)
-                    .font(.system(.subheadline, design: .default, weight: .bold))
-                    .foregroundStyle(RPTheme.textPrimary)
+                    .font(RPFont.body(13, weight: .semibold))
+                    .foregroundStyle(RPTheme.white)
                     .lineLimit(1)
 
                 Text("\(tool.brand) · \(tool.model)")
-                    .font(.system(.caption2, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(10))
+                    .foregroundStyle(RPTheme.gray)
                     .lineLimit(1)
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .font(.system(size: 9))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(RPTheme.warning)
                     Text(String(format: "%.1f", tool.rating))
-                        .font(.system(.caption2, design: .default, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(RPTheme.white)
                     Text("(\(tool.reviewCount))")
-                        .font(.system(.caption2, design: .default))
-                        .foregroundStyle(RPTheme.textSecondary)
+                        .font(.system(size: 10))
+                        .foregroundStyle(RPTheme.gray)
                 }
 
                 Text(tool.pricePerDay)
-                    .font(.system(.footnote, design: .rounded, weight: .bold))
-                    .foregroundStyle(RPTheme.accent)
+                    .font(RPFont.mono(13, weight: .semibold))
+                    .foregroundStyle(RPTheme.gold)
                 + Text(" /jour")
-                    .font(.system(.caption2, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(10))
+                    .foregroundStyle(RPTheme.gray)
             }
             .padding(.horizontal, 10)
-            .padding(.vertical, RPTheme.Spacing.sm)
+            .padding(.vertical, 10)
         }
-        .background(Color(.secondarySystemBackground))
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: RPTheme.cardRadius)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
         .clipShape(.rect(cornerRadius: RPTheme.cardRadius))
-        .shadow(color: RPTheme.cardShadow, radius: 6, x: 0, y: 2)
-        .scaleEffect(appeared ? 1 : 0.95)
+        .rpCardShadow()
+        .scaleEffect(appeared ? 1 : 0.96)
         .opacity(appeared ? 1 : 0)
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
                 appeared = true
             }
         }

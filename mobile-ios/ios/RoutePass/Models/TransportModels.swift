@@ -21,6 +21,8 @@ nonisolated struct Provider: Identifiable, Hashable, Sendable {
     let status: RPStatus
     let isVerified: Bool
     let avatarSystemName: String
+    let avatarURL: String?
+    let vehiclePhotoURL: String?
     let distanceKm: Double?
     let latitude: Double
     let longitude: Double
@@ -56,14 +58,46 @@ enum TransportMockData {
     ]
 
     static let providers: [Provider] = [
-        Provider(id: "p1", name: "Laurent Dupont", vehicleType: "Toyota Corolla · Taxi", categoryID: "taxi", rating: 4.8, reviewCount: 342, tarif: "12 €", status: .disponible, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 0.8, latitude: 48.8566, longitude: 2.3522),
-        Provider(id: "p2", name: "Philippe Martin", vehicleType: "Mercedes Sprinter · Minibus", categoryID: "minibus", rating: 4.6, reviewCount: 128, tarif: "18 €", status: .disponible, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 1.2, latitude: 48.8606, longitude: 2.3376),
-        Provider(id: "p3", name: "Nicolas Lefèvre", vehicleType: "Hyundai Accent · Taxi", categoryID: "taxi", rating: 4.9, reviewCount: 567, tarif: "10 €", status: .occupe, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 2.5, latitude: 48.8738, longitude: 2.2950),
-        Provider(id: "p4", name: "Marc Fontaine", vehicleType: "Vedette rapide · Bateau", categoryID: "bateau", rating: 4.5, reviewCount: 89, tarif: "35 €", status: .disponible, isVerified: false, avatarSystemName: "person.crop.circle.fill", distanceKm: nil, latitude: 48.8584, longitude: 2.2945),
-        Provider(id: "p5", name: "Julien Moreau", vehicleType: "Renault Master · Fret", categoryID: "camion", rating: 4.7, reviewCount: 201, tarif: "45 €", status: .nettoyage, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 3.1, latitude: 48.8867, longitude: 2.3431),
-        Provider(id: "p6", name: "Thomas Bernard", vehicleType: "Peugeot 301 · Taxi", categoryID: "taxi", rating: 4.4, reviewCount: 156, tarif: "11 €", status: .disponible, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 0.5, latitude: 48.8530, longitude: 2.3499),
-        Provider(id: "p7", name: "Sophie Lemaire", vehicleType: "Toyota HiAce · Minibus", categoryID: "minibus", rating: 4.8, reviewCount: 312, tarif: "22 €", status: .disponible, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: 1.8, latitude: 48.8450, longitude: 2.3600),
-        Provider(id: "p8", name: "Pierre Gauthier", vehicleType: "Vedette rapide · Bateau", categoryID: "bateau", rating: 4.3, reviewCount: 45, tarif: "40 €", status: .disponible, isVerified: true, avatarSystemName: "person.crop.circle.fill", distanceKm: nil, latitude: 48.8620, longitude: 2.2870),
+        Provider(id: "p1", name: "Laurent Dupont",  vehicleType: "Toyota Corolla · Taxi",        categoryID: "taxi",    rating: 4.8, reviewCount: 342, tarif: "12 €", status: .disponible, isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 0.8, latitude: 48.8566, longitude: 2.3522),
+        Provider(id: "p2", name: "Philippe Martin", vehicleType: "Mercedes Sprinter · Minibus", categoryID: "minibus", rating: 4.6, reviewCount: 128, tarif: "18 €", status: .disponible, isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1597007029837-2db5e2dd5d54?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 1.2, latitude: 48.8606, longitude: 2.3376),
+        Provider(id: "p3", name: "Nicolas Lefèvre", vehicleType: "Hyundai Accent · Taxi",       categoryID: "taxi",    rating: 4.9, reviewCount: 567, tarif: "10 €", status: .occupe,     isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 2.5, latitude: 48.8738, longitude: 2.2950),
+        Provider(id: "p4", name: "Marc Fontaine",   vehicleType: "Vedette rapide · Bateau",     categoryID: "bateau",  rating: 4.5, reviewCount: 89,  tarif: "35 €", status: .disponible, isVerified: false,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1542558817-5d8d717a85e9?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: nil, latitude: 48.8584, longitude: 2.2945),
+        Provider(id: "p5", name: "Julien Moreau",   vehicleType: "Renault Master · Fret",       categoryID: "camion",  rating: 4.7, reviewCount: 201, tarif: "45 €", status: .nettoyage,  isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 3.1, latitude: 48.8867, longitude: 2.3431),
+        Provider(id: "p6", name: "Thomas Bernard",  vehicleType: "Peugeot 301 · Taxi",          categoryID: "taxi",    rating: 4.4, reviewCount: 156, tarif: "11 €", status: .disponible, isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 0.5, latitude: 48.8530, longitude: 2.3499),
+        Provider(id: "p7", name: "Sophie Lemaire",  vehicleType: "Toyota HiAce · Minibus",      categoryID: "minibus", rating: 4.8, reviewCount: 312, tarif: "22 €", status: .disponible, isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1597007029837-2db5e2dd5d54?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: 1.8, latitude: 48.8450, longitude: 2.3600),
+        Provider(id: "p8", name: "Pierre Gauthier", vehicleType: "Vedette rapide · Bateau",     categoryID: "bateau",  rating: 4.3, reviewCount: 45,  tarif: "40 €", status: .disponible, isVerified: true,
+                 avatarSystemName: "person.crop.circle.fill",
+                 avatarURL:       "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=400&q=80",
+                 vehiclePhotoURL: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=900&q=80",
+                 distanceKm: nil, latitude: 48.8620, longitude: 2.2870),
     ]
 
     static let dailySummary = DailySummary(

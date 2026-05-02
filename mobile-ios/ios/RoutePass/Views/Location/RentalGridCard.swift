@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Card grid Location — image en haut (130pt), titre + propriétaire vérifié,
-/// étoiles, prix or, le tout en dark luxury.
+/// Card grid Location — photo Unsplash en haut (130pt), titre + propriétaire
+/// vérifié, étoiles, prix or, le tout en dark luxury.
 struct RentalGridCard: View {
     let item: RentalItem
     @State private var appeared: Bool = false
@@ -9,20 +9,11 @@ struct RentalGridCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .topLeading) {
-                LinearGradient(
-                    colors: [RPTheme.dark2, RPTheme.dark],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .frame(height: 130)
-                .overlay {
-                    Image(systemName: item.icon)
-                        .font(.system(size: 32, weight: .light))
-                        .foregroundStyle(RPTheme.goldMuted.opacity(0.6))
-                }
+                RPImage(url: item.gallery.first, fallback: item.icon)
+                    .frame(height: 130)
 
                 LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.6)],
+                    colors: [.black.opacity(0), .black.opacity(0.5)],
                     startPoint: .top,
                     endPoint: .bottom
                 )

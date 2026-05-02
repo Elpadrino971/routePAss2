@@ -1,58 +1,78 @@
 import SwiftUI
 
+/// Card prestataire transport — avatar Unsplash + verified, nom, type+distance,
+/// étoiles, prix or, dot pulsant Disponible. Aligné dark luxury.
 struct ProviderCard: View {
     let provider: Provider
     @State private var appeared: Bool = false
 
     var body: some View {
-        HStack(spacing: RPTheme.Spacing.md) {
+        HStack(spacing: 12) {
             avatarView
 
-            VStack(alignment: .leading, spacing: RPTheme.Spacing.xs) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 4) {
                     Text(provider.name)
-                        .font(.system(.subheadline, design: .default, weight: .semibold))
-                        .foregroundStyle(RPTheme.textPrimary)
+                        .font(RPFont.body(14, weight: .semibold))
+                        .foregroundStyle(RPTheme.white)
                         .lineLimit(1)
 
                     if provider.isVerified {
                         Image(systemName: "checkmark.seal.fill")
-                            .font(.caption2)
-                            .foregroundStyle(RPTheme.accent)
+                            .font(.system(size: 11))
+                            .foregroundStyle(RPTheme.success)
                     }
                 }
 
                 Text(provider.vehicleType)
-                    .font(.system(.caption, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(11))
+                    .foregroundStyle(RPTheme.gray)
                     .lineLimit(1)
 
-                HStack(spacing: RPTheme.Spacing.sm) {
-                    ratingView
+                HStack(spacing: 4) {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(RPTheme.warning)
+                    Text(String(format: "%.1f", provider.rating))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(RPTheme.white)
+                    Text("(\(provider.reviewCount))")
+                        .font(.system(size: 10))
+                        .foregroundStyle(RPTheme.gray)
                     if let km = provider.distanceKm {
-                        Text("·")
-                            .foregroundStyle(RPTheme.textSecondary)
-                        Label(String(format: "%.1f km", km), systemImage: "location.fill")
-                            .font(.system(.caption2, design: .default))
-                            .foregroundStyle(RPTheme.textSecondary)
+                        Text("· \(String(format: "%.1f", km)) km")
+                            .font(.system(size: 10))
+                            .foregroundStyle(RPTheme.gray)
                     }
                 }
             }
 
             Spacer(minLength: 0)
 
-            VStack(alignment: .trailing, spacing: RPTheme.Spacing.sm) {
+            VStack(alignment: .trailing, spacing: 6) {
                 Text(provider.tarif)
-                    .font(.system(.callout, design: .rounded, weight: .bold))
-                    .foregroundStyle(RPTheme.accent)
+                    .font(RPFont.mono(15, weight: .semibold))
+                    .foregroundStyle(RPTheme.gold)
 
-                RPBadge(status: provider.status)
+                if provider.status == .disponible {
+                    HStack(spacing: 4) {
+                        PulsingDot(color: RPTheme.success, size: 6)
+                        Text("Disponible")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(RPTheme.success)
+                    }
+                } else {
+                    RPBadge(status: provider.status, compact: true)
+                }
             }
         }
-        .padding(RPTheme.Spacing.md)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(.rect(cornerRadius: RPTheme.cardRadius))
-        .shadow(color: RPTheme.cardShadow, radius: 6, x: 0, y: 2)
+        .padding(12)
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
+        .clipShape(.rect(cornerRadius: 16))
         .scaleEffect(appeared ? 1 : 0.97)
         .opacity(appeared ? 1 : 0)
         .onAppear {
@@ -63,39 +83,13 @@ struct ProviderCard: View {
     }
 
     private var avatarView: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Image(systemName: provider.avatarSystemName)
-                .font(.system(size: 36))
-                .foregroundStyle(RPTheme.accent.opacity(0.7))
-                .frame(width: 56, height: 56)
-                .background(RPTheme.accent.opacity(0.1))
+        ZStack {
+            RPImage(url: provider.avatarURL, fallback: provider.avatarSystemName)
+                .frame(width: 46, height: 46)
                 .clipShape(Circle())
-
-            if provider.isVerified {
-                Circle()
-                    .fill(RPTheme.accent)
-                    .frame(width: 16, height: 16)
-                    .overlay {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                    .offset(x: 2, y: 2)
-            }
-        }
-    }
-
-    private var ratingView: some View {
-        HStack(spacing: 2) {
-            Image(systemName: "star.fill")
-                .font(.caption2)
-                .foregroundStyle(.orange)
-            Text(String(format: "%.1f", provider.rating))
-                .font(.system(.caption2, design: .default, weight: .semibold))
-                .foregroundStyle(RPTheme.textPrimary)
-            Text("(\(provider.reviewCount))")
-                .font(.system(.caption2, design: .default))
-                .foregroundStyle(RPTheme.textSecondary)
+            Circle()
+                .stroke(RPTheme.border, lineWidth: 1)
+                .frame(width: 46, height: 46)
         }
     }
 }

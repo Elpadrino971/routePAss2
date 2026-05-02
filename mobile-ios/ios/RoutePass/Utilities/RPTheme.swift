@@ -108,6 +108,12 @@ enum RPFont {
     static let kicker = Font.system(size: 11, weight: .semibold, design: .default)
 }
 
+extension Notification.Name {
+    /// Notification interne pour pivoter vers un onglet depuis n'importe quelle vue.
+    /// Object = Int (id de l'onglet 0..3 dans ContentView).
+    static let rpJumpToTab = Notification.Name("rp.jumpToTab")
+}
+
 extension View {
     /// Ombre signature des cards ROUTEPASS.
     func rpCardShadow() -> some View {
