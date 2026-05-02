@@ -81,21 +81,16 @@ struct LocationView: View {
 
     private var clientView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                RPSectionHeader(
-                    title: "Location",
-                    subtitle: "Véhicules, bateaux, logements",
-                    icon: "key.fill"
-                )
-
+            VStack(alignment: .leading, spacing: 12) {
                 categoriesSection
-
                 filterChips
-
                 catalogSection
             }
+            .padding(.top, 4)
+            .padding(.bottom, 120)
         }
         .scrollIndicators(.hidden)
+        .background(RPTheme.black.ignoresSafeArea())
         .refreshable {
             await viewModel.refresh()
         }
@@ -133,29 +128,19 @@ struct LocationView: View {
     }
 
     private var filterChips: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: RPTheme.Spacing.sm) {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
                 ForEach(viewModel.filters, id: \.self) { filter in
-                    Button {
+                    RPFilterChip(label: filter, isActive: viewModel.selectedFilter == filter) {
                         withAnimation(.spring(response: 0.3)) {
                             viewModel.selectedFilter = filter
                         }
                         hapticTrigger += 1
-                    } label: {
-                        Text(filter)
-                            .font(.system(.subheadline, design: .default, weight: .medium))
-                            .foregroundStyle(viewModel.selectedFilter == filter ? .white : RPTheme.textPrimary)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(viewModel.selectedFilter == filter ? RPTheme.accent : Color(.tertiarySystemFill))
-                            .clipShape(Capsule())
                     }
                 }
             }
+            .padding(.horizontal, RPTheme.Spacing.lg)
         }
-        .contentMargins(.horizontal, 16)
-        .scrollIndicators(.hidden)
-        .padding(.bottom, RPTheme.Spacing.md)
     }
 
     private var catalogSection: some View {
@@ -170,11 +155,11 @@ struct LocationView: View {
             } else {
                 HStack {
                     Text("\(viewModel.filteredItems.count) biens disponibles")
-                        .font(.system(.subheadline, design: .default, weight: .semibold))
-                        .foregroundStyle(RPTheme.textSecondary)
+                        .font(RPFont.body(13, weight: .semibold))
+                        .foregroundStyle(RPTheme.gray)
                     Spacer()
                 }
-                .padding(.horizontal, RPTheme.Spacing.md)
+                .padding(.horizontal, RPTheme.Spacing.lg)
 
                 if viewModel.filteredItems.isEmpty {
                     RPEmptyState(
@@ -190,24 +175,11 @@ struct LocationView: View {
                             } label: {
                                 RentalGridCard(item: item)
                             }
-                            .contextMenu {
-                                Button {
-                                } label: {
-                                    Label("Voir détail", systemImage: "doc.text.magnifyingglass")
-                                }
-                                Button {
-                                } label: {
-                                    Label("Ajouter aux favoris", systemImage: "heart")
-                                }
-                                Button {
-                                } label: {
-                                    Label("Partager", systemImage: "square.and.arrow.up")
-                                }
-                            }
+                            .buttonStyle(.plain)
                             .sensoryFeedback(.impact(flexibility: .soft), trigger: viewModel.showDetail)
                         }
                     }
-                    .padding(.horizontal, RPTheme.Spacing.md)
+                    .padding(.horizontal, RPTheme.Spacing.lg)
                 }
             }
         }
@@ -217,28 +189,18 @@ struct LocationView: View {
 
 struct ShimmerLocationCard: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.sm) {
-            ShimmerView()
-                .frame(height: 130)
-
-            ShimmerView()
-                .frame(height: 14)
-                .frame(maxWidth: 120)
-
-            ShimmerView()
-                .frame(height: 10)
-                .frame(maxWidth: 80)
-
-            ShimmerView()
-                .frame(height: 10)
-                .frame(maxWidth: 60)
-
-            ShimmerView()
-                .frame(height: 16)
-                .frame(maxWidth: 90)
+        VStack(alignment: .leading, spacing: 8) {
+            ShimmerView().frame(height: 130)
+            ShimmerView().frame(height: 13).frame(maxWidth: 120)
+            ShimmerView().frame(height: 10).frame(maxWidth: 80)
+            ShimmerView().frame(height: 14).frame(maxWidth: 80)
         }
         .padding(10)
-        .background(Color(.secondarySystemBackground))
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: RPTheme.cardRadius)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
         .clipShape(.rect(cornerRadius: RPTheme.cardRadius))
     }
 }

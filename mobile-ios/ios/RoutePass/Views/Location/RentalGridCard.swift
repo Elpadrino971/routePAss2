@@ -1,85 +1,88 @@
 import SwiftUI
 
+/// Card grid Location — image en haut (130pt), titre + propriétaire vérifié,
+/// étoiles, prix or, le tout en dark luxury.
 struct RentalGridCard: View {
     let item: RentalItem
     @State private var appeared: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Color(RPTheme.accent.opacity(0.06))
+            ZStack(alignment: .topLeading) {
+                LinearGradient(
+                    colors: [RPTheme.dark2, RPTheme.dark],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
                 .frame(height: 130)
                 .overlay {
-                    VStack(spacing: RPTheme.Spacing.sm) {
-                        Image(systemName: item.icon)
-                            .font(.system(size: 30))
-                            .foregroundStyle(RPTheme.accent.opacity(0.45))
-                        HStack(spacing: 4) {
-                            ForEach(item.features.prefix(2), id: \.self) { feat in
-                                Text(feat)
-                                    .font(.system(.caption2, design: .default, weight: .medium))
-                                    .foregroundStyle(RPTheme.textSecondary)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color(.systemBackground).opacity(0.8))
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .allowsHitTesting(false)
-                }
-                .clipShape(.rect(cornerRadius: 14))
-                .overlay(alignment: .topLeading) {
-                    RPBadge(status: item.status)
-                        .scaleEffect(0.8)
-                        .padding(6)
+                    Image(systemName: item.icon)
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundStyle(RPTheme.goldMuted.opacity(0.6))
                 }
 
-            VStack(alignment: .leading, spacing: RPTheme.Spacing.xs) {
+                LinearGradient(
+                    colors: [.black.opacity(0), .black.opacity(0.6)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 130)
+
+                RPBadge(status: item.status, compact: true)
+                    .padding(8)
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
                 Text(item.name)
-                    .font(.system(.subheadline, design: .default, weight: .bold))
-                    .foregroundStyle(RPTheme.textPrimary)
+                    .font(RPFont.body(13, weight: .semibold))
+                    .foregroundStyle(RPTheme.white)
                     .lineLimit(1)
 
                 HStack(spacing: 4) {
                     if item.ownerVerified {
                         Image(systemName: "checkmark.seal.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(RPTheme.accent)
+                            .font(.system(size: 9))
+                            .foregroundStyle(RPTheme.success)
                     }
                     Text(item.ownerName)
-                        .font(.system(.caption2, design: .default))
-                        .foregroundStyle(RPTheme.textSecondary)
+                        .font(RPFont.body(10))
+                        .foregroundStyle(RPTheme.gray)
                         .lineLimit(1)
                 }
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .font(.system(size: 9))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(RPTheme.warning)
                     Text(String(format: "%.1f", item.rating))
-                        .font(.system(.caption2, design: .default, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(RPTheme.white)
                     Text("(\(item.reviewCount))")
-                        .font(.system(.caption2, design: .default))
-                        .foregroundStyle(RPTheme.textSecondary)
+                        .font(.system(size: 10))
+                        .foregroundStyle(RPTheme.gray)
                 }
 
                 Text(item.pricePerDay)
-                    .font(.system(.footnote, design: .rounded, weight: .bold))
-                    .foregroundStyle(RPTheme.accent)
+                    .font(RPFont.mono(13, weight: .semibold))
+                    .foregroundStyle(RPTheme.gold)
                 + Text(" /jour")
-                    .font(.system(.caption2, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(10))
+                    .foregroundStyle(RPTheme.gray)
             }
             .padding(.horizontal, 10)
-            .padding(.vertical, RPTheme.Spacing.sm)
+            .padding(.vertical, 10)
         }
-        .background(Color(.secondarySystemBackground))
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: RPTheme.cardRadius)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
         .clipShape(.rect(cornerRadius: RPTheme.cardRadius))
-        .shadow(color: RPTheme.cardShadow, radius: 6, x: 0, y: 2)
-        .scaleEffect(appeared ? 1 : 0.95)
+        .rpCardShadow()
+        .scaleEffect(appeared ? 1 : 0.96)
         .opacity(appeared ? 1 : 0)
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
                 appeared = true
             }
         }

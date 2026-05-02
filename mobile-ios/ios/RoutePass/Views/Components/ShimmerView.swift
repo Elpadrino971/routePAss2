@@ -1,13 +1,18 @@
 import SwiftUI
 
+/// Shimmer placeholder dark luxury — surface dark2 traversée par un flash or.
 struct ShimmerView: View {
-    @State private var phase: CGFloat = -200
+    @State private var phase: CGFloat = -250
 
     var body: some View {
-        Color(.tertiarySystemFill)
+        RPTheme.dark2
             .overlay(
                 LinearGradient(
-                    colors: [.clear, .white.opacity(0.25), .clear],
+                    colors: [
+                        .clear,
+                        RPTheme.gold.opacity(0.18),
+                        .clear
+                    ],
                     startPoint: .leading,
                     endPoint: .trailing
                 )
@@ -16,32 +21,34 @@ struct ShimmerView: View {
             .clipShape(.rect(cornerRadius: 12))
             .onAppear {
                 withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
-                    phase = 400
+                    phase = 500
                 }
             }
     }
 }
 
+/// Skeleton de card horizontal (matching RPCard).
 struct ShimmerCardView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: RPTheme.Spacing.sm) {
+        HStack(spacing: 0) {
             ShimmerView()
-                .frame(height: 160)
+                .frame(width: 130, height: 110)
 
-            ShimmerView()
-                .frame(height: 16)
-                .frame(maxWidth: 180)
-
-            ShimmerView()
-                .frame(height: 12)
-                .frame(maxWidth: 120)
-
-            ShimmerView()
-                .frame(height: 20)
-                .frame(maxWidth: 80)
+            VStack(alignment: .leading, spacing: 8) {
+                ShimmerView().frame(height: 14).frame(maxWidth: 160)
+                ShimmerView().frame(height: 10).frame(maxWidth: 110)
+                Spacer()
+                ShimmerView().frame(height: 14).frame(maxWidth: 80)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 110, alignment: .leading)
         }
-        .padding(RPTheme.Spacing.md)
-        .background(Color(.secondarySystemBackground))
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: RPTheme.cardRadius)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
         .clipShape(.rect(cornerRadius: RPTheme.cardRadius))
     }
 }

@@ -1,20 +1,21 @@
 import SwiftUI
 
+/// Section Immobilier — stats en haut + liste des biens en cards horizontales.
+/// Utilisée dans Découvrir, donc pas de header propre.
 struct ImmobilierView: View {
     @State private var isLoading: Bool = true
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                RPSectionHeader(
-                    title: "Immobilier",
-                    subtitle: "Biens premium à la location",
-                    icon: "building.2.fill"
-                )
-
+            VStack(alignment: .leading, spacing: 16) {
                 statsRow
 
-                VStack(spacing: RPTheme.Spacing.md) {
+                Text("Biens premium")
+                    .font(RPFont.display(18))
+                    .foregroundStyle(RPTheme.white)
+                    .padding(.horizontal, RPTheme.Spacing.lg)
+
+                VStack(spacing: 10) {
                     if isLoading {
                         ForEach(0..<3, id: \.self) { _ in
                             ShimmerCardView()
@@ -25,13 +26,15 @@ struct ImmobilierView: View {
                         }
                     }
                 }
-                .padding(.horizontal, RPTheme.Spacing.md)
-                .padding(.bottom, 80)
+                .padding(.horizontal, RPTheme.Spacing.lg)
             }
+            .padding(.top, 4)
+            .padding(.bottom, 120)
         }
         .scrollIndicators(.hidden)
+        .background(RPTheme.black.ignoresSafeArea())
         .task {
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(for: .seconds(0.8))
             withAnimation(.spring(response: 0.4)) {
                 isLoading = false
             }
@@ -39,13 +42,12 @@ struct ImmobilierView: View {
     }
 
     private var statsRow: some View {
-        HStack(spacing: 12) {
-            StatPill(value: "24", label: "Biens", icon: "house.fill")
-            StatPill(value: "8", label: "Disponibles", icon: "checkmark.circle.fill")
-            StatPill(value: "4.8", label: "Note", icon: "star.fill")
+        HStack(spacing: 10) {
+            StatPill(value: "24", label: "Biens",       icon: "house.fill")
+            StatPill(value: "8",  label: "Disponibles", icon: "checkmark.seal.fill")
+            StatPill(value: "4.8", label: "Note",       icon: "star.fill")
         }
-        .padding(.horizontal, RPTheme.Spacing.md)
-        .padding(.bottom, RPTheme.Spacing.md)
+        .padding(.horizontal, RPTheme.Spacing.lg)
     }
 }
 
@@ -55,22 +57,26 @@ struct StatPill: View {
     let icon: String
 
     var body: some View {
-        VStack(spacing: RPTheme.Spacing.xs) {
+        VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(RPTheme.accent)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(RPTheme.gold)
 
             Text(value)
-                .font(.system(.headline, design: .rounded, weight: .bold))
-                .foregroundStyle(RPTheme.textPrimary)
+                .font(RPFont.mono(18, weight: .semibold))
+                .foregroundStyle(RPTheme.white)
 
             Text(label)
-                .font(.system(.caption2, design: .default))
-                .foregroundStyle(RPTheme.textSecondary)
+                .font(RPFont.body(10))
+                .foregroundStyle(RPTheme.gray)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
-        .background(Color(.secondarySystemBackground))
+        .background(RPTheme.dark)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(RPTheme.border, lineWidth: 1)
+        )
         .clipShape(.rect(cornerRadius: 14))
     }
 }

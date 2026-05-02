@@ -1,6 +1,8 @@
 import SwiftUI
 import AuthenticationServices
 
+/// Auth ROUTEPASS — fond noir luxe, monogramme R or, champs dark luxury,
+/// bouton or "Se connecter" / "S'inscrire", Sign in with Apple en blanc.
 struct AuthView: View {
     @State private var isLogin: Bool = true
     @State private var email: String = ""
@@ -14,23 +16,39 @@ struct AuthView: View {
 
     var body: some View {
         ZStack {
-            RPTheme.backgroundPrimary
-                .ignoresSafeArea()
+            RPTheme.black.ignoresSafeArea()
+
+            // Halo doré subtil en haut
+            VStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [RPTheme.gold.opacity(0.12), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 200
+                        )
+                    )
+                    .frame(width: 360, height: 360)
+                    .offset(y: -120)
+                Spacer()
+            }
+            .ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 0) {
                     headerSection
-                        .padding(.top, 60)
-                        .padding(.bottom, RPTheme.Spacing.xxl)
+                        .padding(.top, 56)
+                        .padding(.bottom, 32)
 
                     formSection
-                        .padding(.bottom, RPTheme.Spacing.xl)
+                        .padding(.bottom, 22)
 
                     dividerSection
-                        .padding(.bottom, RPTheme.Spacing.lg)
+                        .padding(.bottom, 18)
 
                     appleSignInSection
-                        .padding(.bottom, RPTheme.Spacing.xl)
+                        .padding(.bottom, 28)
 
                     toggleSection
                 }
@@ -38,6 +56,7 @@ struct AuthView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
+        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: hapticTrigger)
         .fullScreenCover(isPresented: $showOTP) {
             OTPVerificationView(
@@ -56,52 +75,55 @@ struct AuthView: View {
         }
     }
 
+    // MARK: - Sections
+
     private var headerSection: some View {
-        VStack(spacing: RPTheme.Spacing.md) {
-            ZStack {
-                Circle()
-                    .fill(RPTheme.accent.opacity(0.08))
-                    .frame(width: 80, height: 80)
+        VStack(spacing: 14) {
+            Text("R")
+                .font(RPFont.display(72))
+                .foregroundStyle(RPTheme.goldGradient)
+                .opacity(appeared ? 1 : 0)
+                .scaleEffect(appeared ? 1 : 0.85)
 
-                Text("R")
-                    .font(.system(size: 40, weight: .bold, design: .default))
-                    .foregroundStyle(RPTheme.accent)
-            }
-            .opacity(appeared ? 1 : 0)
-            .scaleEffect(appeared ? 1 : 0.8)
+            Text("ROUTEPASS")
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(6)
+                .foregroundStyle(RPTheme.gold)
 
-            VStack(spacing: RPTheme.Spacing.sm) {
+            VStack(spacing: 6) {
                 Text(isLogin ? "Bon retour" : "Créer un compte")
-                    .font(.system(size: 28, weight: .bold, design: .default))
-                    .foregroundStyle(RPTheme.textPrimary)
+                    .font(RPFont.display(28))
+                    .foregroundStyle(RPTheme.white)
 
                 Text(isLogin
                     ? "Connectez-vous pour continuer."
-                    : "Rejoignez RoutePass en quelques secondes.")
-                    .font(.system(size: 15, weight: .regular, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    : "Rejoignez ROUTEPASS en quelques secondes.")
+                    .font(RPFont.body(13))
+                    .foregroundStyle(RPTheme.gray)
                     .multilineTextAlignment(.center)
             }
             .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 15)
+            .offset(y: appeared ? 0 : 12)
         }
     }
 
     private var formSection: some View {
-        VStack(spacing: RPTheme.Spacing.md) {
+        VStack(spacing: 12) {
             RPTextField(
                 icon: "envelope.fill",
                 placeholder: "Email",
                 text: $email,
                 keyboardType: .emailAddress,
-                autocapitalization: .never
+                autocapitalization: .never,
+                contentType: .emailAddress
             )
 
             RPTextField(
                 icon: "phone.fill",
                 placeholder: "Téléphone (optionnel)",
                 text: $phone,
-                keyboardType: .phonePad
+                keyboardType: .phonePad,
+                contentType: .telephoneNumber
             )
 
             Button {
@@ -110,31 +132,35 @@ struct AuthView: View {
             } label: {
                 Text(isLogin ? "Se connecter" : "S'inscrire")
             }
-            .buttonStyle(RPPrimaryButtonStyle())
+            .buttonStyle(RPPrimaryButtonStyle(size: .lg))
             .disabled(email.isEmpty)
-            .opacity(email.isEmpty ? 0.6 : 1)
+            .opacity(email.isEmpty ? 0.5 : 1)
+            .padding(.top, 6)
         }
         .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 20)
+        .offset(y: appeared ? 0 : 16)
         .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.15), value: appeared)
     }
 
     private var dividerSection: some View {
-        HStack(spacing: RPTheme.Spacing.md) {
-            Rectangle()
-                .fill(RPTheme.separator)
-                .frame(height: 1)
-
+        HStack(spacing: 12) {
+            line
             Text("ou")
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(RPTheme.textSecondary)
-
-            Rectangle()
-                .fill(RPTheme.separator)
-                .frame(height: 1)
+                .font(RPFont.body(11, weight: .medium))
+                .foregroundStyle(RPTheme.gray)
+            line
         }
         .opacity(appeared ? 1 : 0)
         .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.2), value: appeared)
+    }
+
+    private var line: some View {
+        LinearGradient(
+            colors: [RPTheme.gold.opacity(0), RPTheme.gold.opacity(0.4), RPTheme.gold.opacity(0)],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .frame(height: 1)
     }
 
     private var appleSignInSection: some View {
@@ -153,7 +179,7 @@ struct AuthView: View {
                 }
             }
         )
-        .signInWithAppleButtonStyle(.black)
+        .signInWithAppleButtonStyle(.white)
         .frame(height: 52)
         .clipShape(.rect(cornerRadius: RPTheme.buttonRadius))
         .opacity(appeared ? 1 : 0)
@@ -169,12 +195,12 @@ struct AuthView: View {
         } label: {
             HStack(spacing: 4) {
                 Text(isLogin ? "Pas encore de compte ?" : "Déjà un compte ?")
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .foregroundStyle(RPTheme.gray)
                 Text(isLogin ? "S'inscrire" : "Se connecter")
-                    .foregroundStyle(RPTheme.accent)
+                    .foregroundStyle(RPTheme.gold)
                     .fontWeight(.semibold)
             }
-            .font(.system(size: 14, weight: .regular, design: .default))
+            .font(RPFont.body(13))
         }
         .opacity(appeared ? 1 : 0)
         .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.3), value: appeared)

@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Écran de vérification OTP — 6 cases mono dark luxury, focus or, vérif animée.
 struct OTPVerificationView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -18,70 +19,27 @@ struct OTPVerificationView: View {
 
     var body: some View {
         ZStack {
-            RPTheme.backgroundPrimary
-                .ignoresSafeArea()
+            RPTheme.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "arrow.left")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(RPTheme.textPrimary)
-                            .frame(width: 44, height: 44)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, RPTheme.Spacing.md)
+                topBar
 
-                Spacer()
+                Spacer(minLength: 24)
 
-                VStack(spacing: RPTheme.Spacing.xl) {
-                    VStack(spacing: RPTheme.Spacing.sm) {
-                        Image(systemName: isPhone ? "iphone.badge.play" : "envelope.open.fill")
-                            .font(.system(size: 48, weight: .light))
-                            .foregroundStyle(RPTheme.accent)
-                            .opacity(appeared ? 1 : 0)
-                            .scaleEffect(appeared ? 1 : 0.7)
-
-                        Text("Vérification")
-                            .font(.system(size: 28, weight: .bold, design: .default))
-                            .foregroundStyle(RPTheme.textPrimary)
-
-                        Text("Code envoyé à \(contactInfo)")
-                            .font(.system(size: 15, weight: .regular, design: .default))
-                            .foregroundStyle(RPTheme.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 15)
-
+                VStack(spacing: 24) {
+                    headerBlock
                     codeInputSection
-
-                    Button {
-                        verifyCode()
-                    } label: {
-                        if isVerifying {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Vérifier")
-                        }
-                    }
-                    .buttonStyle(RPPrimaryButtonStyle())
-                    .disabled(otpCode.count < codeLength || isVerifying)
-                    .opacity(otpCode.count < codeLength ? 0.6 : 1)
-                    .padding(.horizontal, RPTheme.Spacing.lg)
-
+                    verifyButton
                     resendSection
                 }
                 .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
 
                 Spacer()
                 Spacer()
             }
         }
+        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: hapticTrigger)
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.1)) {
@@ -92,28 +50,82 @@ struct OTPVerificationView: View {
         }
     }
 
+    private var topBar: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(RPTheme.white)
+                    .frame(width: 36, height: 36)
+                    .background(
+                        Circle().fill(RPTheme.dark)
+                            .overlay(Circle().stroke(RPTheme.border))
+                    )
+            }
+            Spacer()
+        }
+        .padding(.horizontal, RPTheme.Spacing.lg)
+        .padding(.top, 8)
+    }
+
+    private var headerBlock: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(RPTheme.dark)
+                    .frame(width: 76, height: 76)
+                    .overlay(Circle().stroke(RPTheme.gold.opacity(0.4), lineWidth: 1))
+
+                Image(systemName: isPhone ? "iphone.gen3.radiowaves.left.and.right" : "envelope.open.fill")
+                    .font(.system(size: 30, weight: .light))
+                    .foregroundStyle(RPTheme.gold)
+            }
+
+            VStack(spacing: 6) {
+                Text("VÉRIFICATION").rpKicker()
+
+                Text("Entrez votre code")
+                    .font(RPFont.display(24))
+                    .foregroundStyle(RPTheme.white)
+
+                Text("Code envoyé à \(contactInfo)")
+                    .font(RPFont.body(13))
+                    .foregroundStyle(RPTheme.gray)
+                    .multilineTextAlignment(.center)
+            }
+        }
+    }
+
+    // MARK: - Code input
+
     private var codeInputSection: some View {
-        VStack(spacing: RPTheme.Spacing.md) {
-            HStack(spacing: 12) {
+        VStack(spacing: 12) {
+            HStack(spacing: 10) {
                 ForEach(0..<codeLength, id: \.self) { index in
                     let char = characterAt(index)
+                    let isCurrent = index == otpCode.count
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(RPTheme.backgroundSecondary)
-                            .frame(width: 48, height: 56)
+                            .fill(RPTheme.dark2)
+                            .frame(width: 44, height: 54)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(
-                                        index == otpCode.count ? RPTheme.accent : .clear,
-                                        lineWidth: 2
+                                        char != nil ? RPTheme.gold.opacity(0.7)
+                                            : (isCurrent ? RPTheme.gold : RPTheme.border),
+                                        lineWidth: isCurrent || char != nil ? 1.4 : 1
                                     )
                             )
 
                         if let char {
                             Text(String(char))
-                                .font(.system(size: 24, weight: .bold, design: .default))
-                                .foregroundStyle(RPTheme.textPrimary)
+                                .font(RPFont.mono(24, weight: .semibold))
+                                .foregroundStyle(RPTheme.white)
                                 .transition(.scale.combined(with: .opacity))
+                        } else if isCurrent {
+                            CursorBlink()
                         }
                     }
                     .animation(.spring(response: 0.25, dampingFraction: 0.7), value: otpCode)
@@ -128,26 +140,36 @@ struct OTPVerificationView: View {
                 .opacity(0)
                 .onChange(of: otpCode) { _, newValue in
                     let filtered = String(newValue.prefix(codeLength).filter { $0.isNumber })
-                    if filtered != newValue {
-                        otpCode = filtered
-                    }
-                    if filtered.count == codeLength {
-                        hapticTrigger += 1
-                    }
+                    if filtered != newValue { otpCode = filtered }
+                    if filtered.count == codeLength { hapticTrigger += 1 }
                 }
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            isCodeFocused = true
+        .onTapGesture { isCodeFocused = true }
+    }
+
+    private var verifyButton: some View {
+        Button {
+            verifyCode()
+        } label: {
+            if isVerifying {
+                ProgressView().tint(RPTheme.black)
+            } else {
+                Text("Vérifier")
+            }
         }
+        .buttonStyle(RPPrimaryButtonStyle(size: .lg))
+        .disabled(otpCode.count < codeLength || isVerifying)
+        .opacity(otpCode.count < codeLength ? 0.5 : 1)
+        .padding(.horizontal, RPTheme.Spacing.lg)
     }
 
     private var resendSection: some View {
         Group {
             if resendCountdown > 0 {
                 Text("Renvoyer le code dans \(resendCountdown)s")
-                    .font(.system(size: 14, weight: .regular, design: .default))
-                    .foregroundStyle(RPTheme.textSecondary)
+                    .font(RPFont.body(13))
+                    .foregroundStyle(RPTheme.gray)
             } else {
                 Button {
                     resendCountdown = 30
@@ -155,12 +177,14 @@ struct OTPVerificationView: View {
                     hapticTrigger += 1
                 } label: {
                     Text("Renvoyer le code")
-                        .font(.system(size: 14, weight: .semibold, design: .default))
-                        .foregroundStyle(RPTheme.accent)
+                        .font(RPFont.body(13, weight: .semibold))
+                        .foregroundStyle(RPTheme.gold)
                 }
             }
         }
     }
+
+    // MARK: - Helpers
 
     private func characterAt(_ index: Int) -> Character? {
         guard index < otpCode.count else { return nil }
@@ -170,7 +194,7 @@ struct OTPVerificationView: View {
     private func verifyCode() {
         isVerifying = true
         Task {
-            try? await Task.sleep(for: .seconds(1.2))
+            try? await Task.sleep(for: .seconds(1.0))
             isVerifying = false
             onVerified()
         }
@@ -183,5 +207,21 @@ struct OTPVerificationView: View {
                 resendCountdown -= 1
             }
         }
+    }
+}
+
+/// Curseur clignotant or pour la case en cours de saisie.
+private struct CursorBlink: View {
+    @State private var visible = true
+    var body: some View {
+        Rectangle()
+            .fill(RPTheme.gold)
+            .frame(width: 2, height: 22)
+            .opacity(visible ? 1 : 0)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 0.6).repeatForever()) {
+                    visible = false
+                }
+            }
     }
 }

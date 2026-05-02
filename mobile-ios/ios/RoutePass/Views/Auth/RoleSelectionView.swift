@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Sélection du rôle ROUTEPASS — sheet sombre, cards or sur sélection.
 struct RoleSelectionView: View {
     let onRoleSelected: (UserRole) -> Void
 
@@ -8,43 +9,47 @@ struct RoleSelectionView: View {
     @State private var hapticTrigger: Int = 0
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: RPTheme.Spacing.lg) {
-                    VStack(spacing: RPTheme.Spacing.sm) {
-                        Text("Qui êtes-vous ?")
-                            .font(.system(size: 24, weight: .bold, design: .default))
-                            .foregroundStyle(RPTheme.textPrimary)
+        ZStack {
+            RPTheme.dark.ignoresSafeArea()
 
-                        Text("Choisissez votre profil pour personnaliser votre expérience.")
-                            .font(.system(size: 15, weight: .regular, design: .default))
-                            .foregroundStyle(RPTheme.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, RPTheme.Spacing.sm)
+            VStack(spacing: 18) {
+                VStack(spacing: 8) {
+                    Text("PROFIL").rpKicker()
 
-                    VStack(spacing: RPTheme.Spacing.md) {
+                    Text("Qui êtes-vous ?")
+                        .font(RPFont.display(26))
+                        .foregroundStyle(RPTheme.white)
+
+                    Text("Choisissez votre profil pour personnaliser votre expérience.")
+                        .font(RPFont.body(13))
+                        .foregroundStyle(RPTheme.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, RPTheme.Spacing.lg)
+                }
+                .padding(.top, 24)
+
+                ScrollView {
+                    VStack(spacing: 10) {
                         ForEach(Array(UserRole.allCases.enumerated()), id: \.element.id) { index, role in
                             roleCard(role: role, index: index)
                         }
                     }
-                    .padding(.horizontal, RPTheme.Spacing.md)
-
-                    if let selected = selectedRole {
-                        Button {
-                            onRoleSelected(selected)
-                        } label: {
-                            Text("Continuer")
-                        }
-                        .buttonStyle(RPPrimaryButtonStyle())
-                        .padding(.horizontal, RPTheme.Spacing.md)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+                    .padding(.horizontal, RPTheme.Spacing.lg)
                 }
-                .padding(.bottom, RPTheme.Spacing.xl)
+                .scrollIndicators(.hidden)
+
+                if selectedRole != nil {
+                    Button("Continuer") {
+                        if let r = selectedRole { onRoleSelected(r) }
+                    }
+                    .buttonStyle(RPPrimaryButtonStyle(size: .lg))
+                    .padding(.horizontal, RPTheme.Spacing.lg)
+                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
-            .navigationBarTitleDisplayMode(.inline)
         }
+        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: hapticTrigger)
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.1)) {
@@ -61,45 +66,51 @@ struct RoleSelectionView: View {
             }
             hapticTrigger += 1
         } label: {
-            HStack(spacing: RPTheme.Spacing.md) {
+            HStack(spacing: 14) {
                 ZStack {
-                    Circle()
-                        .fill(isSelected ? RPTheme.accent.opacity(0.12) : RPTheme.separator)
-                        .frame(width: 56, height: 56)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(isSelected ? AnyShapeStyle(RPTheme.goldGradient) : AnyShapeStyle(RPTheme.dark2))
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(isSelected ? Color.clear : RPTheme.border, lineWidth: 1)
+                        )
 
-                    Text(role.icon)
-                        .font(.system(size: 26))
+                    Image(systemName: role.systemIcon)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(isSelected ? RPTheme.black : RPTheme.gold)
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(role.title)
-                        .font(.system(size: 17, weight: .semibold, design: .default))
-                        .foregroundStyle(RPTheme.textPrimary)
+                        .font(RPFont.body(15, weight: .semibold))
+                        .foregroundStyle(RPTheme.white)
 
                     Text(role.subtitle)
-                        .font(.system(size: 13, weight: .regular, design: .default))
-                        .foregroundStyle(RPTheme.textSecondary)
+                        .font(RPFont.body(12))
+                        .foregroundStyle(RPTheme.gray)
                         .lineLimit(2)
                 }
 
                 Spacer()
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 24))
-                    .foregroundStyle(isSelected ? RPTheme.accent : RPTheme.textSecondary.opacity(0.3))
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? RPTheme.gold : RPTheme.border)
             }
-            .padding(RPTheme.Spacing.md)
+            .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: RPTheme.cardRadius)
-                    .fill(RPTheme.backgroundSecondary)
+                    .fill(RPTheme.dark2)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: RPTheme.cardRadius)
-                    .stroke(isSelected ? RPTheme.accent : .clear, lineWidth: 2)
+                    .stroke(isSelected ? RPTheme.gold.opacity(0.7) : RPTheme.border, lineWidth: 1)
             )
-            .scaleEffect(appeared ? 1 : 0.95)
+            .scaleEffect(appeared ? 1 : 0.96)
             .opacity(appeared ? 1 : 0)
             .animation(.spring(response: 0.4, dampingFraction: 0.8).delay(Double(index) * 0.08), value: appeared)
         }
+        .buttonStyle(.plain)
     }
 }
