@@ -72,13 +72,12 @@ struct TransportView: View {
     private var clientView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                header
                 categoriesGrid
                 scanButton
                 filtersRow
                 providersList
             }
-            .padding(.top, 12)
+            .padding(.top, 4)
             .padding(.bottom, 120)
         }
         .scrollIndicators(.hidden)
